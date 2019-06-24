@@ -1,6 +1,3 @@
-# Ritekit Internship Task
-This a Vuejs task for [RiteKit](https://ritekit.com/) [Vue.js Frontend Web Dev Internship](https://angel.co/ritekit/jobs/354040-vue-js-frontend-web-dev-internship)
-
 
 ## Dependencies
 * Vuejs
@@ -43,6 +40,3 @@ npm run e2e
 npm test
 ```
 
-## Problem or Difficulties
-1. Facing Cors Problem.
-=> Solving it by using Proxy Server.
