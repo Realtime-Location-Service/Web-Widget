@@ -1,4 +1,4 @@
-import store from '@/store'
+import store from '../store/index'
 
 const guestMiddleware = next => {
   if (store.state.auth.token) {

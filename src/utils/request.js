@@ -94,7 +94,7 @@ function handleError (error) {
       message: 'Please login again'
     })
     router.push({
-      name: 'login'
+      name: 'Login'
     })
     return true
   }
