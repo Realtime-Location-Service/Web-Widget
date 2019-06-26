@@ -19,21 +19,27 @@
         <template slot="id" slot-scope="row">
           {{ row.value }}
         </template>
-        <template slot="name" slot-scope="row">
+        <template slot="role" slot-scope="row">
           {{ row.value }}
         </template>
-        <template slot="email" slot-scope="row">
+        <template slot="createAt" slot-scope="row">
           {{ row.value }}
         </template>
 
         <template slot="actions" slot-scope="row">
-          <b-button size="sm" @click="row.toggleDetails">
+          <b-button variant="outline-info" size="sm" @click="row.toggleDetails">
             {{ row.detailsShowing ? 'Hide' : 'Show' }} Location
           </b-button>
         </template>
         <template slot="row-details" slot-scope="row">
           <b-card>
-            <location-map :address="row.item.address"></location-map>
+            <map-filter @searchDateRage="getSearchDateRage"></map-filter>
+            <location-map
+              :searchDateFrom="searchDateFrom"
+              :searchDateTo="searchDateTo"
+              :google="google"
+              :userId="row.item.user_id">
+            </location-map>
           </b-card>
         </template>
         <div slot="table-busy" class="text-center text-danger my-2">
@@ -54,33 +60,48 @@
 
 <script>
 import LocationMap from '../maps/LocationMap'
+import MapFilter from '../maps/MapFilter'
 import {GET} from './../../utils/request.js'
 import {
-  FETCH_USERS
+  RESOLVE_USERS_BY_API_KEY
 } from '../../constants/api.js'
-
+import gmapsInit from '../../utils/gmaps'
 export default {
   data () {
     return {
       users: [],
       isUserDataLoading: true,
-      perPage: 5,
+      perPage: 10,
       currentPage: 1,
-      infoModal: {
-        id: 'info-modal',
-        title: '',
-        content: ''
-      },
+      google: null,
+      searchDateFrom: 0,
+      searchDateTo: 0,
+      isGoogleSdkInitialized: false,
       fields: [
-        { key: 'id', label: '#', sortable: true },
-        { key: 'name', label: 'Name', sortable: true, class: 'text-center' },
-        { key: 'email', label: 'Email' },
+        { key: 'user_id', label: '#', sortable: true },
+        {
+          key: 'role',
+          label: 'Role',
+          sortable: true,
+          class: 'text-center',
+          formatter: value => {
+            return value.toUpperCase()
+          }
+        },
+        {
+          key: 'created_at',
+          label: 'Created At',
+          formatter: value => {
+            return new Date(value).toLocaleDateString()
+          }
+        },
         { key: 'actions', label: 'Actions' }
       ]
     }
   },
   components: {
-    LocationMap
+    LocationMap,
+    MapFilter
   },
   computed: {
     rows () {
@@ -88,13 +109,23 @@ export default {
     }
   },
   async mounted () {
+    await this.googleMapInitialized()
     await this.fetchInitialDataFromApi()
   },
   methods: {
+    getSearchDateRage (value) {
+      this.searchDateFrom = value.searchDateFrom
+      this.searchDateTo = value.searchDateTo
+    },
     async fetchInitialDataFromApi () {
       try {
-        let response = await GET(FETCH_USERS)
-        this.users = response.data
+        let response = await GET(RESOLVE_USERS_BY_API_KEY, {appKey: this.$store.getters.appKey})
+        this.users = response.data.subordinates
+        this.users.push({
+          user_id: response.data.user_id,
+          role: response.data.role,
+          created_at: null
+        })
         this.isUserDataLoading = false
       } catch ($e) {
         this.$iziToast.error({
@@ -106,7 +137,7 @@ export default {
     async fetchPaginatedData () {
       try {
         this.isUserDataLoading = true
-        let response = await GET(FETCH_USERS)
+        let response = await GET(RESOLVE_USERS_BY_API_KEY, {appKey: this.$store.getters.appKey})
         this.users = response.data
         this.isUserDataLoading = false
       } catch ($e) {
@@ -114,6 +145,14 @@ export default {
           title: 'Error',
           message: 'SomeThing Went Wrong!'
         })
+      }
+    },
+    async googleMapInitialized () {
+      try {
+        this.google = await gmapsInit()
+        this.isGoogleSdkInitialized = true
+      } catch (e) {
+        console.error(e)
       }
     }
   }

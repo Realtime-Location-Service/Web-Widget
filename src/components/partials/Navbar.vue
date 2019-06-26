@@ -4,7 +4,7 @@
       <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
       <b-navbar-brand to="/">
         <img
-          src="https://cdn.pixabay.com/photo/2013/07/13/14/05/location-162102_960_720.png"
+          src="../../assets/logo.png"
           height="30px"
           alt="Logo"/>
         Location API
@@ -13,8 +13,8 @@
         <b-navbar-nav class="ml-auto">
           <b-nav-item to="/" v-if="!isUserExist" >Login</b-nav-item>
           <b-nav-item-dropdown right v-if="isUserExist">
-            <template slot="button-content"><b>Talha</b></template>
-            <b-dropdown-item  href="#">Profile</b-dropdown-item>
+            <template slot="button-content"><b>Admin</b></template>
+            <!--<b-dropdown-item  href="#">Profile</b-dropdown-item>-->
             <b-dropdown-item  href="#" @click="logout()">Sign Out</b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>

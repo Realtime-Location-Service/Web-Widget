@@ -9,6 +9,7 @@ import store from './store/index'
 import VueParticles from 'vue-particles'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import './utils/interceptor'
 window._ = require('lodash')
 
 Vue.use(BootstrapVue)
