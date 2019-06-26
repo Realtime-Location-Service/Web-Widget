@@ -1,6 +1,6 @@
 import Login from '../components/Login'
 import UserList from '../components/users/UserList.vue'
-import UsersHeatMap from '../components/users/UsersHeatMap.vue'
+import UsersHeatMap from '../components/maps/UsersHeatMap.vue'
 import Navbar from '../components/partials/Navbar.vue'
 import Sidebar from '../components/partials/Sidebar.vue'
 import NotFound from '../components/404.vue'

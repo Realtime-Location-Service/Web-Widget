@@ -4,13 +4,13 @@
       Users HeatMap
     </div>
     <div class="card-body">
+      <heat-map-filter @radiusSearchResult="getRadiusSearchResult"></heat-map-filter>
       <vue-google-heatmap
         v-if="!isUserDataLoading"
-        :points="points"
+        :points="getCoordinates"
         :lat="getCenterLat"
         :lng="getCenterLng"
-        :initial-zoom="3"
-        :width="displayWidth"
+        :initial-zoom="zoomLevel"
         :height="displayHeight">
       </vue-google-heatmap>
       <div v-else class="text-center text-danger my-2">
@@ -22,8 +22,9 @@
 </template>
 
 <script>
+import HeatMapFilter from './HeatMapFilter'
 import env from '../../../env'
-import {GET} from './../../utils/request.js'
+import {GET} from '../../utils/request.js'
 import {
   RESOLVE_USERS_BY_API_KEY,
   GET_USER_LOCATION
@@ -41,30 +42,46 @@ export default {
       points: [],
       userList: [],
       isUserDataLoading: true,
-      interval: null
+      interval: null,
+      zoomLevel: 8,
+      defaultLat: 0,
+      defaultLon: 0
+    }
+  },
+  components: {
+    HeatMapFilter
+  },
+  watch: {
+    points: function (val) {
+      console.log('parent', this.points)
+      this.isUserDataLoading = true
+      // also use nextTick this way
+      this.$nextTick().then(() => {
+        // Add the component back in
+        this.isUserDataLoading = false
+      })
     }
   },
   computed: {
     displayHeight () {
       return document.documentElement.clientHeight - 200
     },
-    displayWidth () {
-      let size = document.documentElement.clientWidth
-      if (size > 300) {
-        return size - 275
-      }
-      return size
-    },
     getCenterLat () {
-      return this.points[0] ? parseFloat(this.points[0].lat) : 0
+      return this.points[0] ? parseFloat(this.points[0].lat) : this.defaultLat
     },
     getCenterLng () {
-      return this.points[0] ? parseFloat(this.points[0].lng) : 0
+      return this.points[0] ? parseFloat(this.points[0].lng) : this.defaultLon
+    },
+    getCoordinates () {
+      return this.points
     }
   },
   async mounted () {
+    this.isUserDataLoading = true
     await this.getResolvedUsers()
+    await this.getUserLocation()
     await this.executeInterval()
+    this.isUserDataLoading = false
   },
   beforeDestroy () {
     console.log('destroy heatmap interval')
@@ -75,11 +92,11 @@ export default {
       this.interval = setInterval(async () => {
         console.log('interval heatmap execute')
         await this.getResolvedUsers()
+        await this.getUserLocation()
       }, 50000)
     },
     async getResolvedUsers () {
       try {
-        this.isUserDataLoading = true
         let response = await GET(RESOLVE_USERS_BY_API_KEY, {appKey: this.$store.getters.appKey})
         let subordinates = response.data.subordinates
         subordinates.push({
@@ -91,8 +108,6 @@ export default {
           return subordinate.user_id
         })
         this.userList = userArray.join(',')
-        await this.getUserLocation()
-        this.isUserDataLoading = false
       } catch (e) {
         this.$iziToast.error({
           title: 'Error',
@@ -106,8 +121,8 @@ export default {
         let locationResponse = response.data.data
         this.points = _.map(_.values(locationResponse), function (location) {
           return {
-            lat: location ? parseFloat(location.lat) : 0,
-            lng: location ? parseFloat(location.lon) : 0
+            lat: location ? parseFloat(location.lat) : this.defaultLat,
+            lng: location ? parseFloat(location.lon) : this.defaultLon
           }
         })
       } catch (e) {
@@ -116,6 +131,11 @@ export default {
           message: `SomeThing Went Wrong! - ${e}`
         })
       }
+    },
+    getRadiusSearchResult (value) {
+      this.points = value.userCoordinates
+      this.defaultLat = value.searchLat
+      this.defaultLon = value.searchLon
     }
   }
 }

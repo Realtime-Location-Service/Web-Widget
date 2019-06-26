@@ -28,12 +28,12 @@
 
         <template slot="actions" slot-scope="row">
           <b-button variant="outline-info" size="sm" @click="row.toggleDetails">
-            {{ row.detailsShowing ? 'Hide' : 'Show' }} Location
+            {{ row.detailsShowing ? 'Hide' : 'Show' }} Location History
           </b-button>
         </template>
         <template slot="row-details" slot-scope="row">
           <b-card>
-            <map-filter @searchDateRage="getSearchDateRage"></map-filter>
+            <location-map-filter @searchDateRage="getSearchDateRage"></location-map-filter>
             <location-map
               :searchDateFrom="searchDateFrom"
               :searchDateTo="searchDateTo"
@@ -60,7 +60,7 @@
 
 <script>
 import LocationMap from '../maps/LocationMap'
-import MapFilter from '../maps/MapFilter'
+import LocationMapFilter from '../maps/LocationMapFilter'
 import {GET} from './../../utils/request.js'
 import {
   RESOLVE_USERS_BY_API_KEY
@@ -101,7 +101,7 @@ export default {
   },
   components: {
     LocationMap,
-    MapFilter
+    LocationMapFilter
   },
   computed: {
     rows () {
