@@ -79,11 +79,9 @@ export default {
       evt.preventDefault()
       // Save the token.
       await this.$store.dispatch(Types.actions.ACTION_SAVE_TOKEN, {
-        token: 'user token here',
-        remember: true
+        appKey: 'KSAx2mit9nxoyiUW1TnuQ',
+        rlsReferrer: 'www.company1.com'
       })
-      // Fetch the user.
-      // await this.$store.dispatch(Types.actions.ACTION_FETCH_USER)
       this.$router.push({name: 'UserList'})
     },
     onReset (evt) {

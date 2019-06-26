@@ -2,24 +2,26 @@ import Cookies from 'js-cookie'
 import Types from '../types'
 
 const auth = {
-  // state
   state: {
-    user: null,
-    token: Cookies.get('token')
+    user: {},
+    check: null,
+    rlsReferrer: Cookies.get('rlsReferrer'),
+    appKey: Cookies.get('appKey')
   },
 
-  // getters
   getters: {
     user: state => state.user,
-    token: state => state.token,
-    check: state => state.token !== null
+    rlsReferrer: state => state.rlsReferrer,
+    appKey: state => state.appKey,
+    check: state => state.appKey !== null
   },
 
-  // mutations
   mutations: {
-    [Types.mutations.SAVE_TOKEN] (state, {token, remember}) {
-      state.token = token
-      Cookies.set('token', token, {expires: remember ? 365 : null})
+    [Types.mutations.SAVE_TOKEN] (state, {appKey, rlsReferrer}) {
+      state.appKey = appKey
+      state.rlsReferrer = rlsReferrer
+      Cookies.set('appKey', appKey, {expires: 365})
+      Cookies.set('rlsReferrer', rlsReferrer, {expires: 365})
     },
 
     [Types.mutations.SAVE_USER] (state, {user}) {
@@ -28,15 +30,17 @@ const auth = {
 
     [Types.mutations.LOGOUT] (state) {
       state.user = null
-      state.token = null
-      Cookies.remove('token')
+      state.appKey = null
+      state.rlsReferrer = null
+      Cookies.remove('appKey')
+      Cookies.remove('rlsReferrer')
     },
 
     [Types.mutations.UPDATE_USER] (state, {user}) {
       state.user = user
     }
   },
-  // actions
+
   actions: {
     [Types.actions.ACTION_SAVE_TOKEN] ({commit, dispatch}, payload) {
       commit(Types.mutations.SAVE_TOKEN, payload)

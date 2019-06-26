@@ -1,7 +1,7 @@
 import store from '../store/index'
 
 const guestMiddleware = next => {
-  if (store.state.auth.token) {
+  if (store.state.auth.appKey) {
     return next({
       name: 'UserList'
     })
@@ -12,7 +12,7 @@ const guestMiddleware = next => {
 
 // eslint-disable-next-line no-unused-vars
 const authMiddleware = (next, to) => {
-  if (store.state.auth.token) {
+  if (store.state.auth.appKey) {
     return next()
   } else {
     return next({

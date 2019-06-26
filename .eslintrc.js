@@ -5,6 +5,11 @@ module.exports = {
   parserOptions: {
     parser: 'babel-eslint'
   },
+  globals: {
+    "require": true,
+    "_": true,
+    "google": true,
+  },
   env: {
     browser: true,
   },
@@ -30,5 +35,6 @@ module.exports = {
     "no-console": "off",
     "no-inline-comments": "off",
     "no-unused-vars": "off",
+    "no-new": "off",
   }
 }
