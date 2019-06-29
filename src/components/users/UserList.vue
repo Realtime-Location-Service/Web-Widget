@@ -37,7 +37,6 @@
             <location-map
               :searchDateFrom="searchDateFrom"
               :searchDateTo="searchDateTo"
-              :google="google"
               :userId="row.item.user_id">
             </location-map>
           </b-card>
@@ -65,7 +64,6 @@ import {GET} from './../../utils/request.js'
 import {
   RESOLVE_USERS_BY_API_KEY
 } from '../../constants/api.js'
-import gmapsInit from '../../utils/gmaps'
 export default {
   data () {
     return {
@@ -109,7 +107,6 @@ export default {
     }
   },
   async mounted () {
-    await this.googleMapInitialized()
     await this.fetchInitialDataFromApi()
   },
   methods: {
@@ -145,14 +142,6 @@ export default {
           title: 'Error',
           message: 'SomeThing Went Wrong!'
         })
-      }
-    },
-    async googleMapInitialized () {
-      try {
-        this.google = await gmapsInit()
-        this.isGoogleSdkInitialized = true
-      } catch (e) {
-        console.error(e)
       }
     }
   }

@@ -16,6 +16,7 @@ export default {
   name: 'LocationMap',
   data () {
     return {
+      isFirstTimeLoaded: false,
       isMapLoaded: false,
       location: {},
       userCoordinates: [],
@@ -29,10 +30,6 @@ export default {
       type: String,
       default: null
     },
-    google: {
-      type: Object || String,
-      required: true
-    },
     searchDateFrom: {
       type: Number,
       required: true
@@ -43,21 +40,22 @@ export default {
     }
   },
   async mounted () {
-    if (this.google) {
-      await this.getUserLocationHistory()
-    }
+    await this.getUserLocationHistory()
   },
   watch: {
     searchDateFrom: function (val) {
-      this.getUserLocationHistory()
+      if (this.isFirstTimeLoaded) {
+        this.getUserLocationHistory()
+      }
     },
     searchDateTo: function (val) {
-      this.getUserLocationHistory()
+      if (this.isFirstTimeLoaded) {
+        this.getUserLocationHistory()
+      }
     }
   },
   methods: {
     async getUserLocationHistory () {
-      console.log(this.searchDateFrom)
       this.isMapLoaded = false
       try {
         let response = await GET(GET_USER_LOCATION_HISTORY, {
@@ -73,56 +71,65 @@ export default {
           }
         })
 
-        let coordinatesLength = this.userCoordinates.length
-        let defaultCoordinates = {lat: 0, lng: 0}
+        this.initGoogleMap()
 
-        const config = {
-          zoom: 13,
-          center: coordinatesLength > 1 ? this.userCoordinates[this.userCoordinates.length - 1] : defaultCoordinates
-        }
-
-        this.map = new this.google.maps.Map(this.$el, config)
-
-        const endIcon = {
-          url: 'https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-059_pin_location-512.png',
-          scaledSize: new this.google.maps.Size(50, 50),
-          origin: new this.google.maps.Point(0, 0),
-          anchor: new this.google.maps.Point(25, 50)
-        }
-
-        let mapPloyline = new this.google.maps.Polyline({
-          path: this.userCoordinates,
-          geodesic: true,
-          strokeColor: '#FF0000',
-          strokeOpacity: 1.0,
-          strokeWeight: 2
-        })
-
-        mapPloyline.setMap(this.map)
-        // start position
-        // eslint-disable-next-line no-new
-        new this.google.maps.Marker({
-          position: this.userCoordinates[0],
-          map: this.map,
-          title: 'Start Point'
-        })
-        // last position
-        // eslint-disable-next-line no-new
-        new this.google.maps.Marker({
-          position: coordinatesLength > 1 ? this.userCoordinates[this.userCoordinates.length - 1] : defaultCoordinates,
-          map: this.map,
-          title: 'End Point',
-          icon: endIcon,
-          animation: this.google.maps.Animation.DROP
-        })
         this.isMapLoaded = true
+        this.isFirstTimeLoaded = true
       } catch (e) {
         this.$iziToast.error({
           title: 'Error',
           message: `SomeThing Went Wrong! - ${e}`
         })
       }
+    },
+
+    initGoogleMap () {
+      let coordinatesLength = this.userCoordinates.length
+      let defaultCoordinates = {lat: 0, lng: 0}
+      const config = {
+        zoom: 13,
+        center: coordinatesLength > 1 ? this.userCoordinates[this.userCoordinates.length - 1] : defaultCoordinates
+      }
+      this.map = new google.maps.Map(this.$el, config)
+
+      this.generatePolyline()
+      this.googleMapMarker(coordinatesLength, defaultCoordinates)
+    },
+
+    generatePolyline () {
+      let mapPloyline = new google.maps.Polyline({
+        path: this.userCoordinates,
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 1.0,
+        strokeWeight: 2
+      })
+      mapPloyline.setMap(this.map)
+    },
+
+    googleMapMarker (coordinatesLength, defaultCoordinates) {
+      const endIcon = {
+        url: require('../../assets/endMarker.png'),
+        scaledSize: new google.maps.Size(50, 50),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(25, 50)
+      }
+
+      new google.maps.Marker({
+        position: this.userCoordinates[0],
+        map: this.map,
+        title: 'Start Point'
+      })
+
+      new google.maps.Marker({
+        position: coordinatesLength > 1 ? this.userCoordinates[this.userCoordinates.length - 1] : defaultCoordinates,
+        map: this.map,
+        title: 'End Point',
+        icon: endIcon,
+        animation: google.maps.Animation.DROP
+      })
     }
+
   }
 }
 </script>

@@ -9,8 +9,8 @@ const main = axios.create({
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
     'crossdomain': true,
-    'RLS-Referrer': store.state.auth.rlsReferrer,
-    'AppKey': store.state.auth.appKey
+    'RLS-Referrer': store.state.auth.rlsReferrer || '',
+    'AppKey': store.state.auth.appKey || ''
   }
 })
 

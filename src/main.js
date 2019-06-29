@@ -11,6 +11,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import './utils/interceptor'
 window._ = require('lodash')
+window.google = require('./utils/gmaps')
 
 Vue.use(BootstrapVue)
 Vue.use(iziToast)
