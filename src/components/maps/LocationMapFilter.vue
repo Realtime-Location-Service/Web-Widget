@@ -13,7 +13,7 @@
 
 <script>
 export default {
-  name: 'MapFilter',
+  name: 'LocationMapFilter',
   data () {
     return {
       searchDateFrom: '',
@@ -36,7 +36,6 @@ export default {
       this.searchDateTo = searchDateTo
     },
     dateSubmit () {
-      console.log(this.searchDateFrom)
       this.$emit('searchDateRage', {
         searchDateFrom: new Date(this.searchDateFrom).getTime() / 1000,
         searchDateTo: new Date(this.searchDateTo).getTime() / 1000

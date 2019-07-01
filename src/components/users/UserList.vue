@@ -28,16 +28,15 @@
 
         <template slot="actions" slot-scope="row">
           <b-button variant="outline-info" size="sm" @click="row.toggleDetails">
-            {{ row.detailsShowing ? 'Hide' : 'Show' }} Location
+            {{ row.detailsShowing ? 'Hide' : 'Show' }} Location History
           </b-button>
         </template>
         <template slot="row-details" slot-scope="row">
           <b-card>
-            <map-filter @searchDateRage="getSearchDateRage"></map-filter>
+            <location-map-filter @searchDateRage="getSearchDateRage"></location-map-filter>
             <location-map
               :searchDateFrom="searchDateFrom"
               :searchDateTo="searchDateTo"
-              :google="google"
               :userId="row.item.user_id">
             </location-map>
           </b-card>
@@ -60,12 +59,11 @@
 
 <script>
 import LocationMap from '../maps/LocationMap'
-import MapFilter from '../maps/MapFilter'
+import LocationMapFilter from '../maps/LocationMapFilter'
 import {GET} from './../../utils/request.js'
 import {
   RESOLVE_USERS_BY_API_KEY
 } from '../../constants/api.js'
-import gmapsInit from '../../utils/gmaps'
 export default {
   data () {
     return {
@@ -101,7 +99,7 @@ export default {
   },
   components: {
     LocationMap,
-    MapFilter
+    LocationMapFilter
   },
   computed: {
     rows () {
@@ -109,7 +107,6 @@ export default {
     }
   },
   async mounted () {
-    await this.googleMapInitialized()
     await this.fetchInitialDataFromApi()
   },
   methods: {
@@ -145,14 +142,6 @@ export default {
           title: 'Error',
           message: 'SomeThing Went Wrong!'
         })
-      }
-    },
-    async googleMapInitialized () {
-      try {
-        this.google = await gmapsInit()
-        this.isGoogleSdkInitialized = true
-      } catch (e) {
-        console.error(e)
       }
     }
   }
